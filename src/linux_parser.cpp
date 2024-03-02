@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <bits/stdc++.h> 
 
 #include "linux_parser.h"
 
@@ -123,7 +124,12 @@ long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
 long LinuxParser::ActiveJiffies() { return 0; }
 
 // TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+long LinuxParser::IdleJiffies() { 
+  long idle{0};
+  vector<string> CpuUtilizationData = CpuUtilization();
+  idle = stol(CpuUtilizationData[CPUStates::kIdle_]) + stol(CpuUtilizationData[CPUStates::kIOwait_]);
+  return idle;
+}
 
 // Done: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() {

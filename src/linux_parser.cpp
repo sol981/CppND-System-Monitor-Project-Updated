@@ -120,10 +120,16 @@ long LinuxParser::Jiffies() { return 0; }
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
 
-// TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+// DONE: Read and return the number of active jiffies for the system
+long LinuxParser::ActiveJiffies() {
+  vector<string> CpuUtilizationData = CpuUtilization();
+  return (stol(CpuUtilizationData[CPUStates::kUser_]) + stol(CpuUtilizationData[CPUStates::kNice_]) +
+          stol(CpuUtilizationData[CPUStates::kSystem_]) + stol(CpuUtilizationData[CPUStates::kIRQ_]) +
+          stol(CpuUtilizationData[CPUStates::kSoftIRQ_]) + stol(CpuUtilizationData[CPUStates::kSteal_]) +
+          stol(CpuUtilizationData[CPUStates::kGuest_]) + stol(CpuUtilizationData[CPUStates::kGuestNice_]));
+}
 
-// TODO: Read and return the number of idle jiffies for the system
+// DONE: Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies() { 
   long idle{0};
   vector<string> CpuUtilizationData = CpuUtilization();

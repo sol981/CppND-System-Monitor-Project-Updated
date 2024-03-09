@@ -32,14 +32,31 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   int row{0};
   mvwprintw(window, ++row, 2, ("OS: " + system.OperatingSystem()).c_str());
   mvwprintw(window, ++row, 2, ("Kernel: " + system.Kernel()).c_str());
-  mvwprintw(window, ++row, 2, "CPU: ");
+
+  int num_processors = int(system.Cpu().size());
+  for (int i = 0; i < num_processors/2; ++i) {
+    std::string CPU = "CPU" + to_string(i);
+    const char* str = CPU.c_str(); 
+    
+    mvwprintw(window, ++row, 2, str);
+    wattron(window, COLOR_PAIR(1));
+    mvwprintw(window, row, 7, "");
+    wprintw(window, ProgressBar(system.Cpu()[i].Utilization()).c_str());
+    wattroff(window, COLOR_PAIR(1));
+
+    std::string CPU_ = "CPU" + to_string(i + num_processors/2);
+    const char* str_ = CPU_.c_str(); 
+    
+    mvwprintw(window, row, 75, str_);
+    wattron(window, COLOR_PAIR(1));
+    mvwprintw(window, row, 80, "");
+    wprintw(window, ProgressBar(system.Cpu()[i+num_processors/2].Utilization()).c_str());
+    wattroff(window, COLOR_PAIR(1));
+  }
+
+  mvwprintw(window, ++row, 2, "Mem: ");
   wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(system.Cpu().Utilization()).c_str());
-  wattroff(window, COLOR_PAIR(1));
-  mvwprintw(window, ++row, 2, "Memory: ");
-  wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, row, 10, "");
+  mvwprintw(window, row, 7, "");
   wprintw(window, ProgressBar(system.MemoryUtilization()).c_str());
   wattroff(window, COLOR_PAIR(1));
   mvwprintw(window, ++row, 2,
@@ -51,9 +68,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
             ("Up Time: " + Format::ElapsedTime(system.UpTime())).c_str());
   wrefresh(window);
 }
-
-void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
-                                      WINDOW* window, int n) {
+void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes, WINDOW* window, int n) {
   int row{0};
   int const pid_column{2};
   int const user_column{9};
@@ -90,7 +105,7 @@ void NCursesDisplay::Display(System& system, int n) {
   start_color();  // enable color
 
   int x_max{getmaxx(stdscr)};
-  WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
+  WINDOW* system_window = newwin(13, x_max - 1, 0, 0);
   WINDOW* process_window =
       newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
 

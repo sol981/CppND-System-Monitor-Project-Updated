@@ -149,8 +149,8 @@ long LinuxParser::ActiveJiffies(int pid) {
 }
 
 // DONE: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() {
-  vector<string> CpuUtilizationData = CpuUtilization();
+long LinuxParser::CpuActiveJiffies(int id) {
+  vector<string> CpuUtilizationData = CpuUtilization(id);
   return (stol(CpuUtilizationData[CPUStates::kUser_]) + stol(CpuUtilizationData[CPUStates::kNice_]) +
           stol(CpuUtilizationData[CPUStates::kSystem_]) + stol(CpuUtilizationData[CPUStates::kIRQ_]) +
           stol(CpuUtilizationData[CPUStates::kSoftIRQ_]) + stol(CpuUtilizationData[CPUStates::kSteal_]) +
@@ -158,16 +158,17 @@ long LinuxParser::ActiveJiffies() {
 }
 
 // DONE: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { 
+long LinuxParser::CpuIdleJiffies(int id) { 
   long idle{0};
-  vector<string> CpuUtilizationData = CpuUtilization();
+  vector<string> CpuUtilizationData = CpuUtilization(id);
   idle = stol(CpuUtilizationData[CPUStates::kIdle_]) + stol(CpuUtilizationData[CPUStates::kIOwait_]);
   return idle;
 }
 
 // Done: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() {
+vector<string> LinuxParser::CpuUtilization(int id) {
   string cpu, token;
+  string cpu_id = "cpu" + to_string(id);
   string line;
   vector<string> CpuUtilizationData;
   std::ifstream stream(kProcDirectory + kStatFilename);
@@ -176,7 +177,7 @@ vector<string> LinuxParser::CpuUtilization() {
     {
       std::istringstream linestream(line);
       linestream >> cpu;
-      if(cpu == "cpu")
+      if(cpu == cpu_id)
       {
         while (linestream >> token) {
           CpuUtilizationData.push_back(token);
@@ -187,6 +188,24 @@ vector<string> LinuxParser::CpuUtilization() {
   }
   return CpuUtilizationData;
 } 
+
+int LinuxParser::numberCpu()
+{
+  std::ifstream file(kProcDirectory + kStatFilename);
+  string line, token{"cpu"};
+  int numCpu{0};
+
+  if(file.is_open())
+  {
+    while(getline(file, line))
+    {
+      if (line.find(token) != std::string::npos) {
+        numCpu++;
+      }
+    }
+  }
+  return numCpu - 1;
+}
 
 // DONE: Read and return the total number of processes
 int LinuxParser::TotalProcesses() { 
@@ -208,6 +227,7 @@ int LinuxParser::TotalProcesses() {
       }
     }
   }
+  return totalProcesses;
 }
 
 // DONE: Read and return the number of running processes
@@ -230,6 +250,7 @@ int LinuxParser::RunningProcesses() {
       }
     }
   }
+  return runningProcesses;
 }
 
 // DONE: Read and return the command associated with a process
@@ -244,7 +265,7 @@ string LinuxParser::Command(int pid) {
   return cmd;
 }
 
-// TODO: Read and return the memory used by a process
+// DONE: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Ram(int pid) { 
   string key, vmsize,line;

@@ -16,8 +16,9 @@ public:
   void CpuUtilization(long active_ticks, long system_ticks);
   std::string Ram();                       // TODO: See src/process.cpp
   long int UpTime();                       // TODO: See src/process.cpp
-  bool operator<(Process const& a) const;  // TODO: See src/process.cpp
-
+  bool operator<(const Process& a) const;
+  bool operator>(const Process& a) const;
+  
   // TODO: Declare any necessary private members
  private:
     int pid_;

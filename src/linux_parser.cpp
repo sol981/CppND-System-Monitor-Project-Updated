@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <bits/stdc++.h> 
+#include <filesystem>
 
 #include "linux_parser.h"
 
@@ -47,23 +48,29 @@ string LinuxParser::Kernel() {
   return kernel;
 }
 
-// BONUS: Update this to use std::filesystem
+// DONE: Update this to use std::filesystem
 vector<int> LinuxParser::Pids() {
-  vector<int> pids;
-  DIR* directory = opendir(kProcDirectory.c_str());
-  struct dirent* file;
-  while ((file = readdir(directory)) != nullptr) {
-    // Is this a directory?
-    if (file->d_type == DT_DIR) {
-      // Is every character of the name a digit?
-      string filename(file->d_name);
-      if (std::all_of(filename.begin(), filename.end(), isdigit)) {
-        int pid = stoi(filename);
+ std::vector<int> pids;
+  const std::filesystem::path proc_path(kProcDirectory);
+
+  // Check if directory exists and has read permissions
+  if (!std::filesystem::exists(proc_path) || !std::filesystem::is_directory(proc_path)) {
+    std::cerr << "Error: Process directory " << kProcDirectory << " not found or not accessible." << std::endl;
+    return pids;
+  }
+
+  for (const auto& entry : std::filesystem::directory_iterator(proc_path)) {
+    if (std::filesystem::is_directory(entry)) {
+      std::string filename = entry.path().filename().string();
+
+      // Check if filename consists only of digits
+      if (std::all_of(filename.begin(), filename.end(), [](char c) { return std::isdigit(c); })) {
+        int pid = std::stoi(filename);
         pids.push_back(pid);
       }
     }
   }
-  closedir(directory);
+
   return pids;
 }
 

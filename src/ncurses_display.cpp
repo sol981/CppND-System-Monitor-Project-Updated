@@ -1,11 +1,13 @@
+#include "ncurses_display.h"
+
 #include <curses.h>
+
 #include <chrono>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include "format.h"
-#include "ncurses_display.h"
 #include "system.h"
 
 using std::string;
@@ -34,23 +36,25 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   mvwprintw(window, ++row, 2, ("Kernel: " + system.Kernel()).c_str());
 
   int num_processors = int(system.Cpu().size());
-  for (int i = 0; i < num_processors/2; ++i) {
+  for (int i = 0; i < num_processors / 2; ++i) {
     std::string CPU = "CPU" + to_string(i);
-    const char* str = CPU.c_str(); 
-    
+    const char* str = CPU.c_str();
+
     mvwprintw(window, ++row, 2, str);
     wattron(window, COLOR_PAIR(1));
     mvwprintw(window, row, 7, "");
     wprintw(window, ProgressBar(system.Cpu()[i].Utilization()).c_str());
     wattroff(window, COLOR_PAIR(1));
 
-    std::string CPU_ = "CPU" + to_string(i + num_processors/2);
-    const char* str_ = CPU_.c_str(); 
-    
+    std::string CPU_ = "CPU" + to_string(i + num_processors / 2);
+    const char* str_ = CPU_.c_str();
+
     mvwprintw(window, row, 75, str_);
     wattron(window, COLOR_PAIR(1));
     mvwprintw(window, row, 80, "");
-    wprintw(window, ProgressBar(system.Cpu()[i+num_processors/2].Utilization()).c_str());
+    wprintw(window,
+            ProgressBar(system.Cpu()[i + num_processors / 2].Utilization())
+                .c_str());
     wattroff(window, COLOR_PAIR(1));
   }
 
@@ -68,7 +72,8 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
             ("Up Time: " + Format::ElapsedTime(system.UpTime())).c_str());
   wrefresh(window);
 }
-void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes, WINDOW* window, int n) {
+void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
+                                      WINDOW* window, int n) {
   int row{0};
   int const pid_column{2};
   int const user_column{9};

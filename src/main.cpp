@@ -1,7 +1,7 @@
+#include "iostream"
+#include "linux_parser.h"
 #include "ncurses_display.h"
 #include "system.h"
-#include "linux_parser.h"
-#include "iostream"
 
 int main() {
   System system;

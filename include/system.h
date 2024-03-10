@@ -9,7 +9,7 @@
 
 class System {
  public:
-  std::vector<Processor>& Cpu();                   // DONE: See src/system.cpp
+  std::vector<Processor>& Cpu();      // DONE: See src/system.cpp
   std::vector<Process>& Processes();  // DONE: See src/system.cpp
   float MemoryUtilization();          // DONE: See src/system.cpp
   long UpTime();                      // DONE: See src/system.cpp

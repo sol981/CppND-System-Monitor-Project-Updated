@@ -2,13 +2,13 @@
 #define PROCESSOR_H
 
 class Processor {
-public:
+ public:
   Processor(int id);
   float Utilization();  // DONE: See src/processor.cpp
   int CpuID();
 
   // DONE: Declare any necessary private members
-private:
+ private:
   long activeCached_;
   long idleCached_;
   int id_;

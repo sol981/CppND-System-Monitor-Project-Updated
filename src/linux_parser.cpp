@@ -4,7 +4,7 @@
 #include <dirent.h>
 #include <unistd.h>
 
-#include <filesystem>
+#include <experimental/filesystem>
 #include <string>
 #include <vector>
 
@@ -12,6 +12,7 @@ using std::stof;
 using std::string;
 using std::to_string;
 using std::vector;
+namespace fs = std::experimental::filesystem;
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
@@ -52,18 +53,17 @@ string LinuxParser::Kernel() {
 // DONE: Update this to use std::filesystem
 vector<int> LinuxParser::Pids() {
   std::vector<int> pids;
-  const std::filesystem::path proc_path(kProcDirectory);
+  const fs::path proc_path(kProcDirectory);
 
   // Check if directory exists and has read permissions
-  if (!std::filesystem::exists(proc_path) ||
-      !std::filesystem::is_directory(proc_path)) {
+  if (!fs::exists(proc_path) || !fs::is_directory(proc_path)) {
     std::cerr << "Error: Process directory " << kProcDirectory
               << " not found or not accessible." << std::endl;
     return pids;
   }
 
-  for (const auto& entry : std::filesystem::directory_iterator(proc_path)) {
-    if (std::filesystem::is_directory(entry)) {
+  for (const auto& entry : fs::directory_iterator(proc_path)) {
+    if (fs::is_directory(entry)) {
       std::string filename = entry.path().filename().string();
 
       // Check if filename consists only of digits
